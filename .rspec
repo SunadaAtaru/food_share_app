@@ -1,0 +1,5 @@
+
+# spec/spec_helper.rbを読み込む記述
+--require spec_helper
+# テストディスクリプションを表示させる
+--format documentation
