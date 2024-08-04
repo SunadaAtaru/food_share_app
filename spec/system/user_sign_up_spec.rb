@@ -16,3 +16,4 @@ RSpec.describe "User Sign Up", type: :system do
     expect(page).to have_content("testuser")
   end
 end
+
