@@ -1,35 +1,42 @@
-# spec/system/user_login_spec.rb
-require 'rails_helper'
+# # spec/system/user_authentication_spec.rb
+require 'rails_helper' # Railsの環境をロードする
 
-RSpec.describe "User Login", type: :system do
-  let!(:user) { User.create(username: 'testuser', email: 'test@example.com', password: 'password', password_confirmation: 'password') }
+RSpec.describe 'UserLogins', type: :system do
+  let!(:user) { User.create(username: 'testuser', email: 'test@example.com', password: 'password') }
 
-  it "allows a user to log in" do
-    visit login_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: user.password
-    click_button "ログイン"
+  it 'allows a user to log in with valid credentials' do
+    visit login_path # ログインページに移動
 
-    expect(page).to have_content("ログインに成功しました。")
-    expect(page).to have_content(user.username)
+    fill_in 'Email', with: 'test@example.com'
+    fill_in 'Password', with: 'password'
+    click_button 'ログイン'
+
+    expect(page).to have_content('ログインに成功しました。')
+    expect(page).to have_content('testuser')
   end
 
-  it "does not allow a user to log in with invalid credentials" do
+  it 'displays errors when login fails' do
     visit login_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "wrongpassword"
-    click_button "ログイン"
 
-    expect(page).to have_content("メールアドレスまたはパスワードが正しくありません。")
+    fill_in 'Email', with: 'test@example.com'
+    fill_in 'Password', with: 'wrongpassword'
+    click_button 'ログイン'
+
+    expect(page).to have_content('メールアドレスまたはパスワードが正しくありません。')
   end
 
-  it "allows a user to log out" do
+  it 'allows a logged-in user to log out' do
+    # まずログインする
     visit login_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: user.password
-    click_button "ログイン"
-    click_link "ログアウト"
+    fill_in 'Email', with: 'test@example.com'
+    fill_in 'Password', with: 'password'
+    click_button 'ログイン'
 
-    expect(page).to have_content("ログアウトしました。")
+    # ログアウトリンクをクリック
+    click_link 'ログアウト'
+
+    # ログアウト後の確認
+    expect(page).to have_content('ログアウトしました。')
+    expect(page).not_to have_content('testuser') # ログイン中のユーザー名が表示されていないことを確認
   end
 end

@@ -42,6 +42,16 @@ RSpec.describe "Users", type: :request do
         post users_path, params: { user: invalid_attributes }
         expect(response).to be_successful
       end
+
+      it "renders errors on the form" do
+        post users_path, params: { user: invalid_attributes }
+        expect(response.body).to include("can&#39;t be blank") # 実際のエラーメッセージに置き換えてください
+      end
+      it "renders errors on the form" do
+        post users_path, params: { user: invalid_attributes }
+        expect(response.body).to include("error_explanation") # エラーメッセージが表示されることを確認
+      end
+      
     end
   end
 

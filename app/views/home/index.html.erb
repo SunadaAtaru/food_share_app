@@ -1,2 +1,49 @@
-<h1>トップページ</h1>
-<p>ようこそ。</p>
+<!-- app/views/home/index.html.erb -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="display-4 mb-4">ようこそ、ふーどシェアアプリへ！</h1>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <% if current_user %>
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">こんにちは、<%= current_user.username %>さん！</h4>
+          <p>今日はどんな食べ物をシェアしますか？</p>
+          <%= link_to '投稿する', '#', class: 'btn btn-primary' %>
+          <%# <%= link_to 'ログアウト', logout_path, method: :delete, class: 'btn btn-outline-danger' %> 
+        </div>
+      <% else %>
+        <div class="jumbotron">
+          <h2 class="display-6">食べ物を共有し、無駄をなくしましょう。</h2>
+          <p class="lead">ふーどシェアアプリで、余った食材や料理を地域の人々と共有しましょう。</p>
+          <hr class="my-4">
+          <p>新しい友達を作り、食品廃棄を減らし、コミュニティを豊かにしましょう。</p>
+          <%= link_to '新規登録', signup_path, class: 'btn btn-primary btn-lg mr-2' %>
+          <%= link_to 'ログイン', login_path, class: 'btn btn-outline-primary btn-lg' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      
+      <!-- ここに最近の投稿一覧を表示するコードを追加 -->
+      <div class="list-group">
+        <a href="#" class="list-group-item list-group-item-action">
+          
+        </a>
+        <!-- 他の投稿項目も同様に追加 -->
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <h2 class="mb-3">人気のカテゴリー</h2>
+      <!-- ここに人気のカテゴリー一覧を表示するコードを追加 -->
+      
+    </div>
+  </div>
+</div>

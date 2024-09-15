@@ -1,0 +1,14 @@
+<!-- app/views/sessions/_form.html.erb -->
+<%= form_with(scope: :session, url: login_path, local: true, class: "needs-validation", novalidate: true) do |form| %>
+  <div class="mb-3">
+    <%= form.label :email, class: "form-label" %>
+    <%= form.email_field :email, class: "form-control", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :password, class: "form-label" %>
+    <%= form.password_field :password, class: "form-control", required: true %>
+  </div>
+
+  <%= form.submit "ログイン", class: "btn btn-primary w-100" %>
+<% end %>
