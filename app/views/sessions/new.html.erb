@@ -5,8 +5,8 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <h1 class="mb-4">ログイン</h1>
-      <%= render 'shared/error_messages' %>
-      <%= render 'form' %>
+      <%= render 'shared/error_messages', user: @user  %>
+      <%= render 'form', user: @user  %>
     </div>
   </div>
 </div>

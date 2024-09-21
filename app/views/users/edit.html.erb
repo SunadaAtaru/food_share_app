@@ -1,0 +1,10 @@
+<!-- app/views/users/edit.html.erb -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h1 class="mb-4">プロフィールを編集</h1>
+      <%= render 'shared/error_messages', user: @user  %>
+      <%= render 'form', user: @user  %>  <!-- フォームパーシャルを共通で使用 -->
+    </div>
+  </div>
+</div>

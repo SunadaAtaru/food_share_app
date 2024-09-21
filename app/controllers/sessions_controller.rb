@@ -15,7 +15,12 @@ class SessionsController < ApplicationController
     if user && user.authenticate(params[:session][:password])
       log_in user 
       remember user
-      redirect_to user, notice: 'ログインに成功しました。'
+      if session[:new_registration]
+        session.delete(:new_registration)  # フラグを削除
+        redirect_to user, notice: '新規登録が完了しました。'
+      else
+        redirect_to user, notice: 'ログインに成功しました。'
+      end
     else
       flash.now[:alert] = 'メールアドレスまたはパスワードが正しくありません。'
       render 'new'

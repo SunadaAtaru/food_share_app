@@ -48,4 +48,9 @@ module SessionsHelper
     @current_user = nil
   end
 
+  # ログインしているユーザーが引数として渡されたユーザーと一致するかを確認するメソッド
+  def current_user?(user)
+    current_user == user
+  end
+
 end

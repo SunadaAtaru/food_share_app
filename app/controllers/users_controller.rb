@@ -18,7 +18,9 @@ class UsersController < ApplicationController
     if @user.save
       # session[:user_id] = @user.id # ユーザー作成後、自動的にログイン
       log_in @user
-      redirect_to @user, notice: '新規登録が完了しました。'
+      session[:new_registration] = true  # 新規登録時のフラグ
+      redirect_to edit_user_path(@user), notice: '新規登録が完了しました。プロフィールを編集してください。'
+      # redirect_to @user, notice: '新規登録が完了しました。'
     else
       render :new
     end
