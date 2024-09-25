@@ -14,17 +14,15 @@ class UsersController < ApplicationController
   
   # 新規ユーザーを作成
   def create
-    @user = User.new(user_params)
-    if @user.save
-      # session[:user_id] = @user.id # ユーザー作成後、自動的にログイン
-      log_in @user
-      session[:new_registration] = true  # 新規登録時のフラグ
-      redirect_to edit_user_path(@user), notice: '新規登録が完了しました。プロフィールを編集してください。'
-      # redirect_to @user, notice: '新規登録が完了しました。'
+    @user = User.new(user_params)  # ユーザーのパラメータを使って新しいユーザーを作成
+    if @user.save  # ユーザーの保存に成功した場合
+      log_in @user  # 自動的にそのユーザーをログイン状態にする
+      redirect_to edit_user_path(@user), notice: '新規登録が完了しました。プロフィールを編集してください。'  # ユーザーのプロフィール編集ページにリダイレクト
     else
-      render :new
+      render :new  # 保存に失敗した場合、新規登録フォームを再表示
     end
   end
+  
   
   # ユーザー詳細ページを表示
   def show
