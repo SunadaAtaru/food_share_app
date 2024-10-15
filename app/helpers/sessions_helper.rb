@@ -17,8 +17,11 @@ module SessionsHelper
   # 現在ログインしているユーザーを返す（いない場合はnil）
   # @return [User, nil] 現在のユーザーまたはnil
   def current_user
-    # セッションにユーザーIDがある場合
-    if (user_id = session[:user_id])
+    # インスタンス変数 @current_user がすでに定義されている場合（つまり初回呼び出し以降）、
+    # その値を返してメソッドを終了。定義されていなければ次の処理を実行する。
+    return @current_user if instance_variable_defined?(:@current_user)
+
+    if (user_id = session[:user_id]) # セッションにユーザーIDがある場合
       @current_user ||= User.find_by(id: user_id)  # セッションのユーザーIDに対応するユーザーを取得し、インスタンス変数に保存
     # セッションにユーザーIDがない場合、クッキーから取得
     elsif (user_id = cookies.signed[:user_id])
