@@ -10,6 +10,8 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:destroy]
   # 管理者または自身のアカウントのみdestroyアクション実行可能
   before_action :correct_user_or_admin, only: [:destroy]
+  # `:show` アクションが実行される前に `activated_user` メソッドを実行する
+  before_action :activated_user, only: [:show]
   
   # ユーザーを登録日時の降順（新しい順）で並べ替え、1ページに10件ずつ表示
   def index
@@ -40,12 +42,14 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)  # ユーザーのパラメータを使って新しいユーザーを作成
     if @user.save  # ユーザーの保存に成功した場合
-      log_in @user  # 自動的にそのユーザーをログイン状態にする
-      redirect_to edit_user_path(@user), notice: '新規登録が完了しました。プロフィールを編集してください。'  # ユーザーのプロフィール編集ページにリダイレクト
+      @user.send_activation_email  # 有効化メールを送信
+      flash[:info] = "アカウント有効化のためのメールを送信しました。ご確認ください。"  # メール送信後の通知メッセージ
+      redirect_to root_url  # トップページにリダイレクト
     else
       render :new  # 保存に失敗した場合、新規登録フォームを再表示
     end
   end
+  
   
   # ユーザー詳細ページを表示
   def show
@@ -58,12 +62,21 @@ class UsersController < ApplicationController
     flash[:success] = "User deleted"
     redirect_to users_url
   end
-  
+ 
   
 
  
 
   private  # 以降のメソッドはコントローラ内でのみ使用可能
+
+  # ユーザーが有効化されているかどうか確認するメソッド
+  # `@user` には指定されたIDのユーザーを取得し、それが有効化されているかを確認する
+  # 有効化されていない場合はルートページにリダイレクトする
+  def activated_user
+    @user = User.find(params[:id])  # パラメータからユーザーIDを取得し、そのユーザーをデータベースから検索
+    # ユーザーが有効化されていない場合はルートページにリダイレクト
+    redirect_to root_url unless @user.activated?
+  end
 
   # ユーザーが管理者または削除対象のユーザー自身かを確認するメソッド
   def correct_user_or_admin
@@ -93,7 +106,8 @@ class UsersController < ApplicationController
   # 正しいユーザーかどうかを確認
   def correct_user
     @user = User.find(params[:id])  # パラメータからユーザーIDを取得し、そのユーザーを検索
-    redirect_to(root_url) unless current_user?(@user)  # ログイン中のユーザーが指定されたユーザーと一致しない場合、ホームページにリダイレクト
+    # ログイン中のユーザーが指定されたユーザーと一致しない場合、ホームページにリダイレクト
+    redirect_to(root_url) unless current_user?(@user)  
   end
 
   # 対象ユーザーを@userに設定するメソッド

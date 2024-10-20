@@ -33,8 +33,16 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # メール送信でエラーが発生した場合、エラーメッセージを表示する設定、falseからtrueに変更。
+  config.action_mailer.raise_delivery_errors = true
+
+   # 開発環境でのメール送信方法を設定。ここではSMTPを使ってメール送信を行う。新規追加。
+  config.action_mailer.delivery_method = :smtp
+
+  # ローカルホストで動作させる場合のホスト名を設定。自分の環境に合わせる。
+  host = 'localhost:3000'
+  config.action_mailer.default_url_options = { host: host, protocol: 'http' }
+
 
   config.action_mailer.perform_caching = false
 

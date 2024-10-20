@@ -1,9 +1,11 @@
 class User < ApplicationRecord
   # ユーザーが保存される前にメールアドレスをすべて小文字に変換
   before_save :downcase_email
-  
-  # 仮想の属性（データベースには存在しない属性）としてremember_tokenを設定
-  attr_accessor :remember_token
+  # ユーザー作成前に、有効化用トークンとダイジェストを生成
+  before_create :create_activation_digest  
+
+  # 仮想の属性としてremember_token, activation_tokenを設定
+  attr_accessor :remember_token, :activation_token  
   
   # 有効なメールアドレスのフォーマットを定義
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -29,10 +31,8 @@ class User < ApplicationRecord
 
   # 渡された文字列のハッシュ値を返すクラスメソッド
   def self.digest(string)
-    # パスワードのハッシュ化のためのコストを設定（開発環境では低く設定）
     cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
                                                   BCrypt::Engine.cost
-    # ハッシュ値を生成して返す
     BCrypt::Password.create(string, cost: cost)
   end
 
@@ -43,30 +43,42 @@ class User < ApplicationRecord
   
   # ユーザーを記憶する（ログイン状態を維持する）
   def remember
-    # ランダムなトークンを生成してremember_tokenに設定
     self.remember_token = User.new_token
-    # remember_digestカラムにトークンのハッシュ値を保存
     update_column(:remember_digest, User.digest(remember_token))
   end
-  
-  # 渡されたトークンがダイジェストと一致したらtrueを返す
-  def authenticated?(remember_token)
-    # remember_digestがnilの場合はfalseを返す
-    return false if remember_digest.nil?
-    # トークンをダイジェスト化して一致するか確認
-    BCrypt::Password.new(remember_digest).is_password?(remember_token)
+
+  # 与えられた属性がダイジェストと一致したら true を返す
+  def authenticated?(attribute, token)
+    digest = send("#{attribute}_digest")
+    return false if digest.nil?
+    BCrypt::Password.new(digest).is_password?(token)
   end
 
-  # ユーザーのログイン情報を破棄する（ログアウト時に呼び出す）
+  # ユーザーのログイン情報を破棄する
   def forget
-    # remember_digestカラムをnilに設定
     update_column(:remember_digest, nil)
   end
 
-  private
+  # アカウントを有効化する
+  def activate
+    update_columns(activated: true, activated_at: Time.zone.now)
+  end
 
-  # メールアドレスをすべて小文字に変換するプライベートメソッド
+  # 有効化用のメールを送信する
+  def send_activation_email
+    UserMailer.account_activation(self).deliver_now
+  end
+
+private
+
+  # メールアドレスをすべて小文字に変換する
   def downcase_email
     self.email = email.downcase
+  end
+
+  # 有効化トークンとダイジェストを作成・割り当てる
+  def create_activation_digest
+    self.activation_token  = User.new_token
+    self.activation_digest = User.digest(activation_token)
   end
 end

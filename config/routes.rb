@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post 'login', to: 'sessions#create' # create action for login
   delete 'logout', to: 'sessions#destroy', as: 'logout' # logout_path
   # delete '/logout', to: 'sessions#destroy', as: 'logout'
+  resources :account_activations, only: [:edit]
 end
 
 
