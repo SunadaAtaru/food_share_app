@@ -41,12 +41,20 @@ class UsersController < ApplicationController
   # 新規ユーザーを作成
   def create
     @user = User.new(user_params)  # ユーザーのパラメータを使って新しいユーザーを作成
+    puts "User params: #{user_params.inspect}"  # 受け取ったパラメータを確認
+    puts "User valid?: #{@user.valid?}"         # バリデーションの結果を確認
     if @user.save  # ユーザーの保存に成功した場合
+      puts "User saved successfully" # デバッグ用
+      puts "User details: #{@user.inspect}"
       @user.send_activation_email  # 有効化メールを送信
-      flash[:info] = "アカウント有効化のためのメールを送信しました。ご確認ください。"  # メール送信後の通知メッセージ
+      puts "Activation email sent" # デバッグ用
+      flash[:info] = "メールを確認して、アカウントを有効化してください。"  # メール送信後の通知メッセージ
       redirect_to root_url  # トップページにリダイレクト
     else
+      puts "User save failed" # デバッグ用
+      
       render :new  # 保存に失敗した場合、新規登録フォームを再表示
+      puts "Validation errors: #{@user.errors.full_messages}"  # 具体的なエラーメッセージを確認
     end
   end
   

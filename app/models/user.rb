@@ -66,7 +66,13 @@ class User < ApplicationRecord
 
   # 有効化用のメールを送信する
   def send_activation_email
+    puts "Sending activation email" # デバッグ用
     UserMailer.account_activation(self).deliver_now
+    puts "Activation email delivered" # デバッグ用
+  end
+
+  def activation_token_valid?
+    (Time.zone.now - created_at) < 24.hours  # または適切な期間
   end
 
 private

@@ -45,6 +45,13 @@ gem 'will_paginate', '~> 4.0'
 
 gem 'bootstrap-will_paginate'
 # gem 'will_paginate'
+# 10/21追加。下の３つ
+gem 'net-smtp'
+# ついでに以下の2つも追加しておく方が良さそう
+gem 'net-imap'
+gem 'net-pop'
+# Gemfile
+gem 'rails-i18n'
 
 
 
@@ -72,6 +79,9 @@ group :test do
   gem 'selenium-webdriver'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
+
+  gem 'database_cleaner-active_record'
+
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

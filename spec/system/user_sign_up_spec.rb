@@ -55,4 +55,18 @@ RSpec.describe 'UserSignups', type: :system do
     expect(page).to have_content("Password is too short (minimum is 6 characters)")
     expect(page).to have_content("Password confirmation doesn't match Password")
   end
+
+  it 'サインアップ後にアクティベーションメールが送信される' do
+    ActionMailer::Base.deliveries.clear
+  
+    visit signup_path
+    fill_in 'Username', with: 'testuser'
+    fill_in 'Email', with: 'test@example.com'
+    fill_in 'Password', with: 'password'
+    fill_in 'Password confirmation', with: 'password'
+  
+    expect {
+      click_button 'アカウント作成'
+    }.to change { ActionMailer::Base.deliveries.size }.by(1)
+  end
 end

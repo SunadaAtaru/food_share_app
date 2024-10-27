@@ -3,7 +3,8 @@ class UserMailer < ApplicationMailer
   # アカウント有効化メールを送信する
   def account_activation(user)
     @user = user
-    @user.activation_token = User.new_token  # メール内でトークンを使うために生成
+    # @user.activation_token = User.new_token  # メール内でトークンを使うために生成、10/21に消す。
+    #アクティベーショントークンをメーラー内で生成すると、データベースに保存されているトークンと一致しなくなる可能性
     mail to: @user.email, subject: "アカウントの有効化"  # メール送信
   end
 

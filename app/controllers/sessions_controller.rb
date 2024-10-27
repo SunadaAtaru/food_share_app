@@ -5,7 +5,10 @@ class SessionsController < ApplicationController
     if logged_in?
       redirect_to user_path(current_user) # ログイン済みユーザーを自分のページへリダイレクト
     else
-      render 'new' # ログインフォームを表示
+      # render 'new' # ログインフォームを表示
+      # return
+      # render 'new' を削除
+      # なにも書かない（暗黙的にnewテンプレートがレンダリングされます）
     end
   end
 
@@ -15,7 +18,10 @@ class SessionsController < ApplicationController
       if user.activated?  # アカウントが有効化されているかをチェック
         log_in user  # ログイン処理
         remember user  # "remember me" チェックがあれば、セッション永続化処理
-        redirect_to user, notice: 'ログインに成功しました。'  # ログイン後にユーザー詳細ページにリダイレクト
+        # redirect_to user, notice: 'ログインに成功しました。'  # ログイン後にユーザー詳細ページにリダイレクト
+        flash[:success] = 'ログインに成功しました。'
+        redirect_to user_path(user)
+
       else
         flash[:warning] = "アカウントが有効化されていません。メールを確認してください。"  # アカウントが有効化されていない場合の警告メッセージ
         redirect_to root_url  # ルートURLにリダイレクト

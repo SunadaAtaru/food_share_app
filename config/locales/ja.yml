@@ -1,0 +1,18 @@
+# config/locales/ja.yml
+ja:
+  activerecord:
+    attributes:
+      user:
+        username: "ユーザー名"
+        email: "メールアドレス"
+        password: "パスワード"
+        password_confirmation: "パスワード（確認）"
+  # 他のメッセージの翻訳
+  helpers:
+    submit:
+      user:
+        create: "アカウント作成"
+        update: "更新"
+  sessions:
+    new:
+      login: "ログイン"
