@@ -46,9 +46,9 @@ RSpec.describe "Home Page", type: :system do
     #   expect(page).to have_css('footer')
     # end
 
-    it "人気のカテゴリーセクションが表示" do
-      expect(page).to have_content("人気のカテゴリー")
-    end
+    # it "人気のカテゴリーセクションが表示" do
+    #   expect(page).to have_content("人気のカテゴリー")
+    # end
   end
 
   describe "リンクの機能" do

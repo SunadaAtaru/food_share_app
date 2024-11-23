@@ -1,18 +1,43 @@
 # config/locales/ja.yml
 ja:
   activerecord:
+    models:
+      user: "ユーザー"
     attributes:
       user:
         username: "ユーザー名"
         email: "メールアドレス"
         password: "パスワード"
         password_confirmation: "パスワード（確認）"
-  # 他のメッセージの翻訳
+    errors:
+      messages:
+        record_invalid: "バリデーションに失敗しました: %{errors}"
+        taken: "は既に使用されています"
+        blank: "を入力してください"
+        confirmation: "と%{attribute}の入力が一致しません"
+        too_short: "は%{count}文字以上で入力してください"
+        too_long: "は%{count}文字以下で入力してください"
+        invalid: "は不正な値です"
+      models:
+        user:
+          attributes:
+            username:
+              taken: "は既に使用されています"
+            email:
+              taken: "は既に使用されています"
+              invalid: "は不正な形式です"
+            password:
+              blank: "を入力してください"
+              too_short: "は%{count}文字以上で入力してください"
+            password_confirmation:
+              confirmation: "とパスワードの入力が一致しません"
+
   helpers:
     submit:
       user:
         create: "アカウント作成"
         update: "更新"
+
   sessions:
     new:
       login: "ログイン"

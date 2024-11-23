@@ -43,7 +43,8 @@ gem 'faker'
 # gem 'will_paginate',
 gem 'will_paginate', '~> 4.0'
 
-gem 'bootstrap-will_paginate'
+# gem 'bootstrap-will_paginate'
+gem 'will_paginate-bootstrap-style'
 # gem 'will_paginate'
 # 10/21追加。下の３つ
 gem 'net-smtp'
@@ -52,6 +53,10 @@ gem 'net-imap'
 gem 'net-pop'
 # Gemfile
 gem 'rails-i18n'
+
+# gem 'letter_opener', group: :development
+
+
 
 
 
@@ -71,7 +76,10 @@ group :development do
   gem 'listen', '~> 3.3'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   # gem 'spring'
+  gem 'letter_opener'
 end
+
+
 
 group :test do
   # Adds support for Capybara system testing and selenium driver

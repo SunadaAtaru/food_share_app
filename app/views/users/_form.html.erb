@@ -1,5 +1,6 @@
 <!-- app/views/users/_form.html.erb -->
-<%= form_with(model: user, local: true, class: "needs-validation", novalidate: true) do |f| %>
+<%= form_with(model: user, local: true) do |f| %>
+  <%= render 'shared/error_messages', user: @user %>
   <div class="mb-3">
     <%= f.label :username,"ユーザー名", class: "form-label" %>
     <%= f.text_field :username, class: "form-control", required: true %>

@@ -35,22 +35,47 @@ Rails.application.configure do
 
   # メール送信でエラーが発生した場合、エラーメッセージを表示する設定、falseからtrueに変更。
   config.action_mailer.raise_delivery_errors = true
+  #メール関係の設定を一つにまとめる
+  config.action_mailer.delivery_method = :letter_opener
+  #メール関係の設定を一つにまとめる
+  config.action_mailer.perform_deliveries = true
+  #メール関係の設定を一つにまとめる
+  config.action_mailer.perform_caching = false
+
 
    # 開発環境でのメール送信方法を設定。ここではSMTPを使ってメール送信を行う。新規追加。
-  config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.delivery_method = :smtp
 
   # ローカルホストで動作させる場合のホスト名を設定。自分の環境に合わせる。
-  host = 'localhost:3000'
-  config.action_mailer.default_url_options = { host: host, protocol: 'http' }
+  # host = 'localhost:3000'
+  # config.action_mailer.default_url_options = { host: host, protocol: 'http' }
+  # ホスト設定（1箇所にまとめる）
+  config.action_mailer.default_url_options = { host: 'localhost:3000', protocol: 'http' }
 
 
-  config.action_mailer.perform_caching = false
+  
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
+#   config.action_mailer.smtp_settings = {
+#   address: 'smtp.gmail.com',
+#   port: 587,
+#   domain: 'example.com',
+#   user_name: 'your_email@gmail.com',
+#   password: 'your_app_password', # Gmailの場合、アプリパスワードを使用
+#   authentication: 'plain',
+#   enable_starttls_auto: true
+#  }
+
+  
+
+  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+
   # Raise exceptions for disallowed deprecations.
   config.active_support.disallowed_deprecation = :raise
+
+  
 
   # Tell Active Support which deprecation messages to disallow.
   config.active_support.disallowed_deprecation_warnings = []

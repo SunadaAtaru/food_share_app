@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'password_resets/new'
+  get 'password_resets/edit'
   root 'home#index'
   get 'home/index', to: 'home#index' # ここを追加
   # ユーザー登録（サインアップ）用のルートを追加
@@ -7,8 +9,8 @@ Rails.application.routes.draw do
   get 'login', to: 'sessions#new', as: 'login' # login_path
   post 'login', to: 'sessions#create' # create action for login
   delete 'logout', to: 'sessions#destroy', as: 'logout' # logout_path
-  # delete '/logout', to: 'sessions#destroy', as: 'logout'
   resources :account_activations, only: [:edit]
+  resources :password_resets,     only: [:new, :create, :edit, :update]
 end
 
 

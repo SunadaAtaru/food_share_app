@@ -5,7 +5,7 @@ class User < ApplicationRecord
   before_create :create_activation_digest  
 
   # 仮想の属性としてremember_token, activation_tokenを設定
-  attr_accessor :remember_token, :activation_token  
+  attr_accessor :remember_token, :activation_token,  :reset_token
   
   # 有効なメールアドレスのフォーマットを定義
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -43,9 +43,9 @@ class User < ApplicationRecord
   
   # ユーザーを記憶する（ログイン状態を維持する）
   def remember
-    self.remember_token = User.new_token
-    update_column(:remember_digest, User.digest(remember_token))
-  end
+    self.remember_token = User.new_token # トークンを生成
+    update_column(:remember_digest, User.digest(remember_token)) # ハッシュ化して保/
+ _ end
 
   # 与えられた属性がダイジェストと一致したら true を返す
   def authenticated?(attribute, token)
@@ -66,25 +66,91 @@ class User < ApplicationRecord
 
   # 有効化用のメールを送信する
   def send_activation_email
-    puts "Sending activation email" # デバッグ用
+    
     UserMailer.account_activation(self).deliver_now
-    puts "Activation email delivered" # デバッグ用
+    
   end
 
   def activation_token_valid?
     (Time.zone.now - created_at) < 24.hours  # または適切な期間
   end
 
-private
+  # パスワードリセット用の属性を設定するメソッド
+  def create_reset_digest
+    # SecureRandomを使用して作成した安全なランダムトークンを設定
+    self.reset_token = User.new_token
+    
+    # データベースを更新：
+    # - reset_digest: トークンをハッシュ化して保存
+    # - reset_sent_at: 現在時刻を保存
+    # update_columnsを使用することでバリデーションをスキップし、
+    # データベースを1回の操作で更新
+    update_columns(reset_digest: User.digest(reset_token),
+                  reset_sent_at: Time.zone.now)
+  end
 
-  # メールアドレスをすべて小文字に変換する
+  # パスワードリセット用メールを送信するメソッド
+  def send_password_reset_email
+    # UserMailerクラスのpassword_resetメソッドを呼び出し
+    # deliver_nowで即時メール送信を実行
+    UserMailer.password_reset(self).deliver_now
+  end
+
+  # パスワードリセットの期限切れをチェックするメソッド
+  def password_reset_expired?
+    # reset_sent_atが2時間以上前の場合はtrueを返す
+    # 2.hours.agoは現在時刻から2時間前の時間を返す
+    reset_sent_at < 2.hours.ago
+  end
+
+  private  # この行以降のメソッドは、このクラス内でのみ使用可能
+
+  # メールアドレスを小文字に変換するメソッド
   def downcase_email
+    # self.email：このユーザーインスタンスのemailプロパティを指す
+    # email.downcase：現在のメールアドレスを小文字に変換
+    #
+    # 例：
+    # あるユーザーのメールアドレスが "User@Example.com" の場合
+    # "User@Example.com".downcase => "user@example.com"
+    
     self.email = email.downcase
+    
+    # 別の書き方：
+    # self.email = self.email.downcase
+    # email.downcase! # 破壊的メソッドを使用する場合
   end
 
-  # 有効化トークンとダイジェストを作成・割り当てる
+  # アカウント有効化のためのトークンとダイジェストを作成するメソッド
   def create_activation_digest
-    self.activation_token  = User.new_token
+    # 1. トークンの生成
+    # User.new_tokenで安全なランダムな文字列を生成
+    # 生成されたトークンは一時的な属性（activation_token）に保存
+    self.activation_token = User.new_token
+    # 生成例："q5lt38hQDc_959PVoo6b7A"
+
+    # 2. ダイジェストの作成
+    # 生成したトークンをハッシュ化してデータベースに保存
+    # User.digest(activation_token)でハッシュ化
+    # 生成されたハッシュはactivation_digestカラムに保存
     self.activation_digest = User.digest(activation_token)
+    # ハッシュ化例："$2a$12$UNqJ45z0wMqyxC8RFP.M1OJYWf6wPSxXXGxpuNW8IC"
+
+    # このメソッドが実行される流れ：
+    # 1. ユーザーが新規登録フォームを送信
+    # 2. before_createコールバックでこのメソッドが呼ばれる
+    # 3. トークンとダイジェストが生成される
+    # 4. ダイジェストはデータベースに保存
+    # 5. トークンは有効化メールに含めて送信される
   end
+
+# 補足：
+# - privateキーワードを使用する理由：
+#   - これらのメソッドはクラス内部の処理としてのみ使用
+#   - 外部からの直接呼び出しを防ぐ
+#   - コードの安全性とカプセル化を高める
+#
+# - selfを使用する理由：
+#   - 単なる email = という代入は、ローカル変数の作成と解釈される
+#   - self.email = とすることで、インスタンス変数への代入だと明示
 end

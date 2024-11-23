@@ -50,6 +50,7 @@ module SessionsHelper
 
   # 現在のユーザーをログアウトする
   def log_out
+    return unless logged_in?  # ログインしていない場合は何もしない
     forget(current_user)  # 永続的セッションを削除
     session.delete(:user_id)  # セッションからユーザーIDを削除
     @current_user = nil  # 現在のユーザーをクリア

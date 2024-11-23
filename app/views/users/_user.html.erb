@@ -1,10 +1,11 @@
 <li class="media mb-3">
-  <%= gravatar_for user, size: 50, class: "mr-3 rounded-circle" %>
+  <%# <%= gravatar_for user, size: 50, class: "me-3 rounded-circle" %>
+  <%= gravatar_for user, { size: 50, class: "me-3 rounded-circle" } %>
   <div class="media-body">
     <h5 class="mt-0 mb-1">
-      <%= link_to user.name, user %>
+      <%= link_to user.username, user %>
         <% if current_user.admin? || current_user?(user) %>
-          | <%= link_to "delete", user, method: :delete, data: { confirm: "Are you sure?" }, class: "text-danger" %>
+          | <%= link_to "削除する", user, method: :delete, data: { confirm: "Are you sure?" }, class: "text-danger" %>
         <% end %>
      </h5>
     <!-- 他のユーザー情報を表示する場合はここに追加 -->

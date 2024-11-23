@@ -13,6 +13,15 @@
  *= require_tree .
  *= require_self
  */
+ // この順序が重要です
+@import "bootstrap";  // 最初にBootstrapを読み込む
+
+
+ .navbar {
+  background-color:#FF99FF; /* 好きな色のカラーコードを指定 */
+ }
+
+
  .btn-outline-primary:hover {
   background-color: #0d6efd;
   border-color: #0d6efd;

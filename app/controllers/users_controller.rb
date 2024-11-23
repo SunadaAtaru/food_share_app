@@ -1,23 +1,33 @@
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
+  # アクション実行前に対象ユーザーを設定
+  # correct_user_or_adminを追加
+  before_action :set_user, only: [:destroy, :edit, :update, :show, :correct_user_or_admin]
   # ログインユーザーのみアクセス可能なアクションを指定
   before_action :logged_in_user, only: [:edit, :update, :index, :destroy]
   # 正しいユーザーのみアクセス可能なアクションを指定
   before_action :correct_user,   only: [:edit, :update]
   # 管理者のみアクセス可能なアクションを指定
-  before_action :admin_user,     only: :destroy
-  # destroyアクション実行前に対象ユーザーを設定
-  before_action :set_user, only: [:destroy]
+  before_action :admin_user,     only: [:destroy]
+  
   # 管理者または自身のアカウントのみdestroyアクション実行可能
   before_action :correct_user_or_admin, only: [:destroy]
   # `:show` アクションが実行される前に `activated_user` メソッドを実行する
   before_action :activated_user, only: [:show]
   
   # ユーザーを登録日時の降順（新しい順）で並べ替え、1ページに10件ずつ表示
+  # def index
+  #   @users = User.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
+  # end
   def index
-    @users = User.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
+    if current_user.admin?
+      @users = User.order(created_at: :desc).paginate(page: params[:page], per_page: 10)
+    else
+      @users = User.where(admin: false)
+                   .order(created_at: :desc)
+                   .paginate(page: params[:page], per_page: 10)
+    end
   end
-  
   
   
   # 新規ユーザー登録フォームを表示
@@ -26,11 +36,11 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
+    # @user = User.find(params[:id])
   end
 
   def update
-    @user = User.find(params[:id])
+    # @user = User.find(params[:id])
     if @user.update(user_params)
       # 更新に成功した場合の処理
     else
@@ -41,27 +51,23 @@ class UsersController < ApplicationController
   # 新規ユーザーを作成
   def create
     @user = User.new(user_params)  # ユーザーのパラメータを使って新しいユーザーを作成
-    puts "User params: #{user_params.inspect}"  # 受け取ったパラメータを確認
-    puts "User valid?: #{@user.valid?}"         # バリデーションの結果を確認
+  
     if @user.save  # ユーザーの保存に成功した場合
-      puts "User saved successfully" # デバッグ用
-      puts "User details: #{@user.inspect}"
+      
       @user.send_activation_email  # 有効化メールを送信
-      puts "Activation email sent" # デバッグ用
       flash[:info] = "メールを確認して、アカウントを有効化してください。"  # メール送信後の通知メッセージ
       redirect_to root_url  # トップページにリダイレクト
     else
-      puts "User save failed" # デバッグ用
       
       render :new  # 保存に失敗した場合、新規登録フォームを再表示
-      puts "Validation errors: #{@user.errors.full_messages}"  # 具体的なエラーメッセージを確認
+      
     end
   end
   
   
   # ユーザー詳細ページを表示
   def show
-    @user = User.find(params[:id])  # URLのパラメータからユーザーIDを取得し、そのユーザーをデータベースから検索して表示
+    # @user = User.find(params[:id])  # URLのパラメータからユーザーIDを取得し、そのユーザーをデータベースから検索して表示
   end
 
   def destroy
@@ -81,14 +87,14 @@ class UsersController < ApplicationController
   # `@user` には指定されたIDのユーザーを取得し、それが有効化されているかを確認する
   # 有効化されていない場合はルートページにリダイレクトする
   def activated_user
-    @user = User.find(params[:id])  # パラメータからユーザーIDを取得し、そのユーザーをデータベースから検索
+    # @user = User.find(params[:id])  # パラメータからユーザーIDを取得し、そのユーザーをデータベースから検索
     # ユーザーが有効化されていない場合はルートページにリダイレクト
     redirect_to root_url unless @user.activated?
   end
 
   # ユーザーが管理者または削除対象のユーザー自身かを確認するメソッド
   def correct_user_or_admin
-    @user = User.find(params[:id])
+    # @user = User.find(params[:id])
     unless current_user.admin? || current_user?(@user)
       flash[:danger] = "You are not authorized to delete this user"
       redirect_to root_url
@@ -112,13 +118,16 @@ class UsersController < ApplicationController
   end
   
   # 正しいユーザーかどうかを確認
+  
+  # シンプルで理解しやすい
   def correct_user
-    @user = User.find(params[:id])  # パラメータからユーザーIDを取得し、そのユーザーを検索
-    # ログイン中のユーザーが指定されたユーザーと一致しない場合、ホームページにリダイレクト
-    redirect_to(root_url) unless current_user?(@user)  
+    unless current_user?(@user)
+      flash[:danger] = "アクセス権限がありません"
+      redirect_to root_url
+    end
   end
 
-  # 対象ユーザーを@userに設定するメソッド
+  
   def set_user
     @user = User.find(params[:id])
   end

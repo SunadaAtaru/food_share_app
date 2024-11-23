@@ -1,18 +1,16 @@
+# ユーザー関連のメール送信を担当するメイラークラス
 class UserMailer < ApplicationMailer
-
-  # アカウント有効化メールを送信する
+  # アカウント有効化メールを送信するメソッド
+  # @param user アカウント有効化メールを送信するユーザーオブジェクト
   def account_activation(user)
-    @user = user
-    # @user.activation_token = User.new_token  # メール内でトークンを使うために生成、10/21に消す。
-    #アクティベーショントークンをメーラー内で生成すると、データベースに保存されているトークンと一致しなくなる可能性
-    mail to: @user.email, subject: "アカウントの有効化"  # メール送信
+    @user = user  # メールテンプレートで使用するユーザー情報をインスタンス変数に設定
+    mail to: user.email, subject: "Account activation"  # メールの宛先とタイトルを指定して送信
   end
-
-  # パスワードリセットメールを送信する
-  def password_reset(user)
-    @user = user
-    @user.reset_token = User.new_token  # メール内でリセットトークンを使うために生成
-    mail to: @user.email, subject: "パスワードのリセット"  # メール送信
-  end
-
-end
+ 
+  # パスワードリセットメールを送信するメソッド
+  # @param user パスワードリセットメールを送信するユーザーオブジェクト
+   def password_reset(user)
+     @user = user  # メールテンプレートで使用するユーザー情報をインスタンス変数に設定
+     mail to: user.email, subject: "Password reset"  # メールの宛先とタイトルを指定して送信
+   end
+ end

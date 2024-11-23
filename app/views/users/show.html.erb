@@ -1,8 +1,11 @@
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <h1 class="mb-4">User Profile</h1>
-      <%= render 'profile', user: @user %> <!-- パーシャルを呼び出してユーザー情報を表示 -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>User Profile</h1>
+        <%= link_to 'ユーザー一覧', users_path, class: 'btn btn-outline-primary' %>
+      </div>
+      <%= render 'profile', user: @user %>
     </div>
   </div>
 </div>
