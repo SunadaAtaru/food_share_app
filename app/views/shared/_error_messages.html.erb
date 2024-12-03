@@ -1,13 +1,12 @@
 <!-- app/views/shared/_error_messages.html.erb -->
-<% if user.errors.any? %>
+<% if object.errors.any? %>
   <div id="error_explanation" class="alert alert-danger w-100 mb-0">
     <div class="container">
       <h2 class="h5 mb-2">
-        <%# <%= pluralize(user.errors.count, "個のエラー")により保存できません： %>
-        <%= user.errors.count %>個のエラーにより保存できません：
+        <%= object.errors.count %>個のエラーにより保存できません：
       </h2>
       <ul class="mb-0">
-        <% user.errors.full_messages.each do |msg| %>
+        <% object.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
         <% end %>
       </ul>

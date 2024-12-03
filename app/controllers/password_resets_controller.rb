@@ -34,7 +34,7 @@ class PasswordResetsController < ApplicationController
     else
       # ユーザーが見つからない場合
       # セキュリティ上、具体的なエラー内容は最小限に
-      flash.now[:danger] = "Email address not found"  # エラーメッセージ
+      flash.now[:danger] = "メールアドレスが見つかりませんでした"  # エラーメッセージ
       render 'new'  # 入力フォームを再表示
     end
   end
@@ -85,8 +85,12 @@ class PasswordResetsController < ApplicationController
     
     # ユーザー取得メソッド
     # パラメータのメールアドレスに基づいてユーザーを検索
+    # def get_user
+    #   @user = User.find_by(email: params[:email])
+    # end
+
     def get_user
-      @user = User.find_by(email: params[:email])
+      @user = User.find_by(reset_digest: params[:id])
     end
 
     # ユーザーの正当性確認メソッド

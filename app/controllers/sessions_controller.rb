@@ -17,6 +17,7 @@ class SessionsController < ApplicationController
    end
 
   def create
+    # raise
     user = User.find_by(email: params[:session][:email].downcase)  # フォームから送信されたメールアドレスでユーザーを検索
     if user && user.authenticate(params[:session][:password])  # ユーザーが存在し、パスワードが正しければ
       if user.activated?  # アカウントが有効化されているかをチェック

@@ -40,14 +40,28 @@ class UsersController < ApplicationController
   end
 
   def update
-    # @user = User.find(params[:id])
-    if @user.update(user_params)
-      # 更新に成功した場合の処理
-    else
-      render 'edit'
+    Rails.logger.debug "Original params: #{params[:user]}"
+    Rails.logger.debug "Avatar present?: #{params[:user][:avatar].present?}"
+    
+    # パラメータを取得
+    permitted_params = user_params
+    
+    # パスワードが空の場合、パスワード関連のパラメータを削除
+    if permitted_params[:password].blank?
+      @user.skip_password_validation
+      permitted_params = permitted_params.except(:password, :password_confirmation)
     end
-  end
-  
+    
+    Rails.logger.debug "Filtered params: #{permitted_params}"
+    
+    if @user.update(permitted_params)  # ← user_paramsではなくpermitted_paramsを使用
+      flash[:success] = 'プロフィールを更新しました'
+      redirect_to @user
+    else
+      Rails.logger.debug "Validation errors: #{@user.errors.full_messages}"
+      render :edit
+    end
+  end  
   # 新規ユーザーを作成
   def create
     @user = User.new(user_params)  # ユーザーのパラメータを使って新しいユーザーを作成
@@ -105,7 +119,8 @@ class UsersController < ApplicationController
   # Strong Parametersを使用してパラメータを制限
   def user_params
     # フォームから送信されるデータのうち、許可されたキーのみを抽出する
-    params.require(:user).permit(:username, :email, :password, :password_confirmation)
+    # params.require(:user).permit(:username, :email, :password, :password_confirmation)
+    params.require(:user).permit(:username, :email, :password, :password_confirmation, :avatar, :avatar_cache)
   end
   
   # ログインしていない場合、ログインページにリダイレクト

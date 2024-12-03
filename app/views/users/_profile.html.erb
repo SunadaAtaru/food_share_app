@@ -1,5 +1,14 @@
+<%# # app/views/users/_profile.html.erb %>
 <div class="user-profile">
-  <%= gravatar_for user, size: 100, class: "rounded-circle" %>
+<% if user.avatar? %>
+  <%= image_tag user.avatar.thumb.url, class: "rounded-circle" %>
+<% else %>
+  <%= image_tag 'fallback/default.png', class: "rounded-circle" %>
+<% end %>
+  
   <h2><%= user.username %></h2>
-  <!-- 他のユーザー情報を表示する場合はここに追加 -->
+  <%# #他のユーザー情報を表示する場合 %>
+  <% if current_user == user %>
+    <%= link_to "プロフィールを編集", edit_user_path(user), class: "btn btn-outline-primary" %>
+  <% end %>
 </div>

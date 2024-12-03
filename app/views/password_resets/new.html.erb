@@ -1,15 +1,15 @@
-<%# オプション1: エラーメッセージ表示付き %>
-<div class="container">  <%# containerを追加するとより安定します %>
- <h1 class="text-center mb-4">パスワードリセット</h1>  <%# 見出しを追加 %>
-  <div class="row">
-    <div class="col-md-6 col-md-offset-3">
+<div class="container">
+ <h1 class="text-center mb-5 mt-5 py-2">パスワードをリセットする</h1>
+  <div class="row justify-content-center"> <%# justify-content-centerを追加 %>
+    <div class="col-md-6">
       <%= form_with(url: password_resets_path, scope: :password_reset, local: true) do |f| %>
-        <%= render 'shared/error_messages' if @user&.errors.any? %>
-        
-        <%= f.label :email %>
-        <%= f.email_field :email, class: 'form-control' %>
+       <%= f.label :メールアドレスを入力 %> <%# この行はdivの外に %>
+        <div class="text-center"> <%# フォーム要素を中央揃えにするdivを追加 %>
+          
+          <%= f.email_field :email, class: 'form-control mb-4' %> <%# mb-3で下マージンを追加 %>
 
-        <%= f.submit "パスワードリセット", class: "btn btn-primary" %>
+          <%= f.submit "送信する", class: "btn btn-primary mt-4" %> <%# mt-3で上マージンを追加 %>
+        </div>
       <% end %>
     </div>
   </div>

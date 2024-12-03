@@ -1,6 +1,7 @@
 <li class="media mb-3">
   <%# <%= gravatar_for user, size: 50, class: "me-3 rounded-circle" %>
-  <%= gravatar_for user, { size: 50, class: "me-3 rounded-circle" } %>
+  <%# <%= gravatar_for user, { size: 50, class: "me-3 rounded-circle" } %> 
+  <%= avatar_for user, { size: 50, class: "me-3 rounded-circle" } %>
   <div class="media-body">
     <h5 class="mt-0 mb-1">
       <%= link_to user.username, user %>

@@ -4,8 +4,11 @@ class User < ApplicationRecord
   # ユーザー作成前に、有効化用トークンとダイジェストを生成
   before_create :create_activation_digest  
 
+  mount_uploader :avatar, AvatarUploader
+
+
   # 仮想の属性としてremember_token, activation_tokenを設定
-  attr_accessor :remember_token, :activation_token,  :reset_token
+  attr_accessor :remember_token, :activation_token,  :reset_token, :skip_password_validation  # この行を追加
   
   # 有効なメールアドレスのフォーマットを定義
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -28,53 +31,65 @@ class User < ApplicationRecord
   validates :password, presence: true,                           # 空でないことを検証
                        length: { minimum: 6 },                   # 6文字以上であることを検証
                        allow_nil: true                          # パスワードがnilの場合はバリデーションをスキップ
+  
+  # バリデーション
+  validate :avatar_size_validation
 
   # 渡された文字列のハッシュ値を返すクラスメソッド
+  # @param string ハッシュ化する文字列
+  # @return ハッシュ化された文字列
   def self.digest(string)
-    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
-                                                  BCrypt::Engine.cost
+    # 開発環境ではコストを下げて高速化、本番環境では標準のコストを使用
+    cost = ActiveModel::SecurePassword.min_cost ? 
+          BCrypt::Engine::MIN_COST : BCrypt::Engine.cost
+    # BCryptを使用して文字列をハッシュ化
     BCrypt::Password.create(string, cost: cost)
   end
-
-  # ランダムなトークンを生成するクラスメソッド
+  
+  # セキュアなランダムトークンを生成するクラスメソッド
+  # @return ランダムな64文字のトークン
   def self.new_token
-    SecureRandom.urlsafe_base64
+    SecureRandom.urlsafe_base64  # URL-safeなbase64でエンコードされたランダムな文字列を生成
   end
   
-  # ユーザーを記憶する（ログイン状態を維持する）
+  # 永続セッション用のユーザーを記憶する
   def remember
-    self.remember_token = User.new_token # トークンを生成
-    update_column(:remember_digest, User.digest(remember_token)) # ハッシュ化して保/
- _ end
-
-  # 与えられた属性がダイジェストと一致したら true を返す
+    self.remember_token = User.new_token  # 仮想属性にトークンを設定
+    update_column(:remember_digest, User.digest(remember_token))  # トークンのハッシュ値をDBに保存
+  end
+  
+  # トークンがダイジェストと一致することを確認する汎用的な認証メソッド
+  # @param attribute 認証する属性（:remember, :activation, :reset など）
+  # @param token 認証するトークン
+  # @return boolean 認証成功ならtrue、失敗ならfalse
   def authenticated?(attribute, token)
-    digest = send("#{attribute}_digest")
-    return false if digest.nil?
-    BCrypt::Password.new(digest).is_password?(token)
+    digest = send("#{attribute}_digest")  # 対応するダイジェストを動的に取得
+    return false if digest.nil?  # ダイジェストがnilの場合は認証失敗
+    BCrypt::Password.new(digest).is_password?(token)  # トークンとダイジェストを比較
   end
-
-  # ユーザーのログイン情報を破棄する
+  
+  # ユーザーのログイン情報を破棄する（ログアウト用）
   def forget
-    update_column(:remember_digest, nil)
+    update_column(:remember_digest, nil)  # remember_digestをnilに設定
   end
-
+  
   # アカウントを有効化する
   def activate
+    # 複数のカラムを一度に更新（activated: trueと有効化時刻）
     update_columns(activated: true, activated_at: Time.zone.now)
   end
-
-  # 有効化用のメールを送信する
+  
+  # アカウント有効化メールを送信する
   def send_activation_email
-    
+    # 非同期でアクティベーションメールを送信
     UserMailer.account_activation(self).deliver_now
-    
   end
-
+  
+  # アクティベーショントークンの有効期限をチェック（24時間以内）
+  # @return boolean トークンが有効ならtrue、期限切れならfalse
   def activation_token_valid?
-    (Time.zone.now - created_at) < 24.hours  # または適切な期間
+    (Time.zone.now - created_at) < 24.hours  # アカウント作成から24時間以内かチェック
   end
-
   # パスワードリセット用の属性を設定するメソッド
   def create_reset_digest
     # SecureRandomを使用して作成した安全なランダムトークンを設定
@@ -103,7 +118,27 @@ class User < ApplicationRecord
     reset_sent_at < 2.hours.ago
   end
 
+  # パスワードを任意入力可能にするためのメソッド
+  # @skip_password_validationフラグを設定することで、
+  # パスワードの入力を必須としないケースを制御します
+  def skip_password_validation
+    @skip_password_validation = true
+  end
+
+
   private  # この行以降のメソッドは、このクラス内でのみ使用可能
+
+
+  # has_secure_passwordのパスワードバリデーションをカスタマイズするメソッド
+  # @return [Boolean] パスワードが必須かどうか
+  # @skip_password_validation == true の場合：
+  #   - パスワードバリデーションをスキップ（false を返す）
+  # @skip_password_validation == false の場合：
+  #   - 通常のhas_secure_passwordの動作を継続（super でデフォルトの動作を実行）
+  def password_required?
+    return false if @skip_password_validation
+    super  # has_secure_passwordのデフォルトの判定処理を実行
+  end
 
   # メールアドレスを小文字に変換するメソッド
   def downcase_email
@@ -144,13 +179,18 @@ class User < ApplicationRecord
     # 5. トークンは有効化メールに含めて送信される
   end
 
-# 補足：
-# - privateキーワードを使用する理由：
-#   - これらのメソッドはクラス内部の処理としてのみ使用
-#   - 外部からの直接呼び出しを防ぐ
-#   - コードの安全性とカプセル化を高める
-#
-# - selfを使用する理由：
-#   - 単なる email = という代入は、ローカル変数の作成と解釈される
-#   - self.email = とすることで、インスタンス変数への代入だと明示
+  # 補足：
+  # - privateキーワードを使用する理由：
+  #   - これらのメソッドはクラス内部の処理としてのみ使用
+  #   - 外部からの直接呼び出しを防ぐ
+  #   - コードの安全性とカプセル化を高める
+  #
+  # - selfを使用する理由：
+  #   - 単なる email = という代入は、ローカル変数の作成と解釈される
+  #   - self.email = とすることで、インスタンス変数への代入だと明示
+  def avatar_size_validation
+    if avatar.size > 5.megabytes
+      errors.add(:avatar, "画像サイズは5MB以下にしてください")
+    end
+  end
 end

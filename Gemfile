@@ -43,6 +43,9 @@ gem 'faker'
 # gem 'will_paginate',
 gem 'will_paginate', '~> 4.0'
 
+gem 'carrierwave'
+gem 'mini_magick'  # 画像のリサイズなどの処理に必要
+gem 'image_processing', '~> 1.2'
 # gem 'bootstrap-will_paginate'
 gem 'will_paginate-bootstrap-style'
 # gem 'will_paginate'
