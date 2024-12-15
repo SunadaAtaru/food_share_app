@@ -1,0 +1,65 @@
+<h1>「<%= @food_post.title %>」の詳細</h1>
+
+
+# app/views/food_posts/show.html.erb
+<div class="container mx-auto px-4">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-4"><%= @food_post.title %></h1>
+
+    <% if @food_post.image.attached? %>
+      <%= image_tag @food_post.image, class: "w-full h-64 object-cover mb-4 rounded" %>
+    <% end %>
+
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <h3 class="font-bold">数量</h3>
+        <p><%= @food_post.quantity %><%= @food_post.unit %></p>
+      </div>
+
+      <div>
+        <h3 class="font-bold">消費期限</h3>
+        <p class="formatted-date"><%= @food_post.expiration_date %></p>
+      </div>
+
+      <div>
+        <h3 class="font-bold">受け渡し場所</h3>
+        <p><%= @food_post.pickup_location %></p>
+      </div>
+
+      <div>
+        <h3 class="font-bold">受け渡し可能時間</h3>
+        <p><%= @food_post.pickup_time_slot %></p>
+      </div>
+    </div>
+
+    <% if @food_post.description.present? %>
+      <div class="mb-4">
+        <h3 class="font-bold">補足説明</h3>
+        <p><%= @food_post.description %></p>
+      </div>
+    <% end %>
+
+    <% if @food_post.reason.present? %>
+      <div class="mb-4">
+        <h3 class="font-bold">提供理由</h3>
+        <p><%= @food_post.reason %></p>
+      </div>
+    <% end %>
+
+    <% if current_user == @food_post.user %>
+      <div class="flex gap-2">
+        <%= link_to "編集", edit_food_post_path(@food_post), 
+            class: "bg-blue-500 text-white px-4 py-2 rounded" %>
+        <%= link_to "削除", food_post_path(@food_post), 
+            method: :delete, 
+            data: { confirm: "本当に削除しますか？" }, 
+            class: "bg-red-500 text-white px-4 py-2 rounded" %>
+      </div>
+    <% else %>
+      <%= button_to "受け取りを希望する", request_food_post_path(@food_post), 
+          method: :post, 
+          class: "bg-green-500 text-white px-4 py-2 rounded w-full" %>
+    <% end %>
+  </div>
+</div>
+

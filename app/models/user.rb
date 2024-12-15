@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+
+  has_many :food_posts, dependent: :destroy #追加12/5。
   # ユーザーが保存される前にメールアドレスをすべて小文字に変換
   before_save :downcase_email
   # ユーザー作成前に、有効化用トークンとダイジェストを生成

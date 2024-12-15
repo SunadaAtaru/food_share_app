@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-12 col-lg-10"> 
+      <h1 class="mb-3 mt-1"><%= title %></h1> <%# col-lg-6 でより狭く %>
+      <%= form_with(model: @food_post, local: true, multipart: true) do |f| %>
+        <%= render 'shared/error_messages', object: @food_post %>
+
+        <div class="mb-3">
+          <%= f.label :title, "食品名", class: "form-label" %>
+          <%= f.text_field :title, class: "form-control", required: true %>
+        </div>
+
+        <%# 説明欄を追加 %>
+        <div class="mb-3">
+          <%= f.label :description, "説明", class: "form-label" %>
+          <%= f.text_area :description, 
+              class: "form-control", 
+              placeholder: "食品の状態や詳細な説明を入力してください", 
+              rows: 4 %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :quantity, "数量", class: "form-label" %>
+          <%= f.number_field :quantity, class: "form-control", required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :unit, "単位", class: "form-label" %>
+          <%= f.text_field :unit, class: "form-control", required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :expiration_date, "消費期限", class: "form-label" %>
+          <%= f.text_field :expiration_date, 
+              class: "form-control datepicker", 
+              required: true,
+              placeholder: "消費期限" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :pickup_location, "受け渡し場所", class: "form-label" %>
+          <%= f.text_field :pickup_location, class: "form-control", required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :pickup_time_slot, "受け渡し可能時間", class: "form-label" %>
+          <%= f.text_field :pickup_time_slot, class: "form-control", required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :image, "画像", class: "form-label" %>
+          <%= f.file_field :image, accept: 'image/jpeg,image/png,image/gif', class: "form-control" %>
+        </div>
+
+        <%# ボタンの部分を div で囲み、マージンを追加 %>
+        <div class="my-5">  <%# mb-5 でより大きな余白 %>
+          <%= f.submit "投稿する", class: "btn btn-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

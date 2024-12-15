@@ -10,17 +10,43 @@
         <ul class="navbar-nav ms-auto">
           <% if logged_in? %>
             <li class="nav-item">
-              <%= link_to "プロフィール", user_path(current_user), class: "nav-link" %>
+              <% if current_page?(user_path(current_user)) %>
+                <span class="nav-link current-page">プロフィール</span>
+              <% else %>
+                <%= link_to "プロフィール", user_path(current_user), class: "nav-link" %>
+              <% end %>
+            </li>
+            <li class="nav-item">
+              <% if current_page?(new_food_post_path) %>
+                <span class="nav-link current-page">投稿する</span>
+              <% else %>
+                <%= link_to "投稿する", new_food_post_path, class: "nav-link" %>
+              <% end %>
             </li>
             <li class="nav-item">
               <%= link_to "ログアウト", logout_path, method: :delete, class: "nav-link" %>
             </li>
+            <li class="nav-item">
+              <% if current_page?(food_posts_path) %>
+                <span class="nav-link current-page">食品一覧</span>
+              <% else %>
+                <%= link_to "食品一覧", food_posts_path, class: "nav-link" %>
+              <% end %>
+            </li>
           <% else %>
             <li class="nav-item">
-              <%= link_to "ログイン", login_path, class: "nav-link" %>
+              <% if current_page?(login_path) %>
+                <span class="nav-link current-page">ログイン</span>
+              <% else %>
+                <%= link_to "ログイン", login_path, class: "nav-link" %>
+              <% end %>
             </li>
             <li class="nav-item">
-              <%= link_to "サインアップ", signup_path, class: "nav-link" %>
+              <% if current_page?(signup_path) %>
+                <span class="nav-link current-page">サインアップ</span>
+              <% else %>
+                <%= link_to "サインアップ", signup_path, class: "nav-link" %>
+              <% end %>
             </li>
           <% end %>
         </ul>

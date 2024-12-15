@@ -1,0 +1,49 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12">  <%# col-mdからcol-lgに変更 %>
+      <h1 class="mb-4 text-center">提供可能な食品一覧</h1>
+
+      <%= render 'search', q: @q %>
+
+    <div class="row g-4">  <%# g-4でグリッドのギャップを調整 %>
+      <% @food_posts.each do |post| %>
+        <div class="col-lg-4 col-md-6">  <%# レスポンシブ調整 %>
+          <div class="card h-100">
+            <% if post.image.present? %>
+              <%= image_tag post.image.url, class: "card-img-top", style: "height: 200px; object-fit: cover;" %>
+            <% end %>
+            
+            <div class="card-body">
+              <h5 class="card-title"><%= post.title %></h5>
+              <p class="card-text">
+                <small class="text-muted">
+                  数量: <%= post.quantity %><%= post.unit %>
+                </small>
+              </p>
+              <p class="card-text">
+                <small class="text-muted">
+                  消費期限: <%= post.expiration_date.strftime('%Y年%m月%d日') %>
+                </small>
+              </p>
+              <p class="card-text">
+                <small class="text-muted">
+                  受け渡し場所: <%= post.pickup_location %>
+                </small>
+              </p>
+              <%= link_to "詳細を見る", food_post_path(post),
+                  class: "btn btn-primary w-100" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <%= will_paginate @food_posts, 
+          class: 'pagination',
+          inner_window: 2,
+          outer_window: 1 %>
+     </div>
+    </div>
+   </div>
+  </div>

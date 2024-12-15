@@ -13,7 +13,7 @@
           <div class="alert alert-success" role="alert">
             <h4 class="alert-heading">こんにちは、<%= current_user.username %>さん！</h4>
             <p>今日はどんな食べ物をシェアしますか？</p>
-            <%= link_to '投稿する', '#', class: 'btn btn-primary' %>
+            <%= link_to '投稿する', new_food_post_path, class: 'btn btn-primary' %>
             <%# <%= link_to 'ログアウト', logout_path, method: :delete, class: 'btn btn-outline-danger' %> 
           </div>
         <% else %>
